@@ -1,0 +1,111 @@
+openapi: 3.0.3
+info:
+  title: Prices
+  version: '1.0.0'
+servers:
+    - url: 'http://localhost:8080'
+tags:
+  - name: The Price API
+paths:
+  '/prices/{brandId}/{productId}':
+    parameters:
+      - schema:
+          type: integer
+        name: brandId
+        description: Product chain id
+        allowEmptyValue: false
+        in: path
+        required: true
+      - schema:
+          type: integer
+        name: productId
+        description: Product code
+        allowEmptyValue: false
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: startDate
+        description: Date from the price is active
+        allowEmptyValue: false
+        in: query
+        required: true
+
+    get:
+      tags:
+        - Prices
+      operationId: "get-all-prices"
+      summary: "Get prices"
+      responses:
+        '200':
+          description: "Successfull operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Prices"
+        '400':
+          description: "Invalid data"
+        '500':
+          description: "Internal error"
+
+components:
+  schemas:
+    Prices:
+      type: array
+      minItems: 0
+      uniqueItems: true
+      items:
+        $ref: '#/components/schemas/Price'
+    Price:
+      x-class-extra-annotation: "@javax.persistence.Entity @javax.persistence.Table(name=\"PRICES\", indexes = @javax.persistence.Index(columnList = \"BRAND_ID\"))"
+      properties:
+        id:
+          x-field-extra-annotation: "@javax.persistence.Id @javax.persistence.GeneratedValue(strategy = javax.persistence.GenerationType.IDENTITY)"
+          type: integer
+        brandId:
+          x-field-extra-annotation: "@javax.persistence.Column(name=\"BRAND_ID\") "
+          type: integer
+        startDate:
+          x-field-extra-annotation: "@javax.persistence.Column(name=\"START_DATE\")"
+          type: string
+          example: '2020-12-31-23.59.59'
+          pattern: '^(20)\d\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[.]([01]?[0-9]|2[0-3])[.][0-5][0-9][.][0-5][0-9])$'
+        endDate:
+          x-field-extra-annotation: "@javax.persistence.Column(name=\"END_DATE\")"
+          type: string
+          example: '2020-12-31-23.59.59'
+          pattern: '^(20)\d\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])[.]([01]?[0-9]|2[0-3])[.][0-5][0-9][.][0-5][0-9])$'
+        priceList:
+          x-field-extra-annotation: "@javax.persistence.Column(name=\"PRICE_LIST\")"
+          type: integer
+        productId:
+          x-field-extra-annotation: "@javax.persistence.Column(name=\"PRODUCT_ID\")"
+          type: integer
+        priority:
+          x-field-extra-annotation: "@javax.persistence.Column(name=\"PRIORITY\")"
+          type: integer
+        price:
+          x-field-extra-annotation: "@javax.persistence.Column(name=\"PRICE\")"
+          type: number
+          format: double
+        currency:
+          x-field-extra-annotation: "@javax.persistence.Column(name=\"CURR\")"
+          type: string
+#        brand:
+#          x-field-extra-annotation: "@javax.persistence.ManyToOne(fetch = javax.persistence.FetchType.LAZY, optional=false) @javax.persistence.JoinColumn(name = \"brandId\", nullable = false)"
+#          type: object
+#          $ref: '#/components/schemas/Brand'
+#    Brand:
+#      x-class-extra-annotation:
+#        "@javax.persistence.Entity @javax.persistence.Table(name=\"BRANDS\")"
+#      type: object
+#      properties:
+#        brandId:
+#          x-field-extra-annotation:
+#            "@javax.persistence.Id
+#            @javax.persistence.Column(name=\"BRAND_ID\")"
+#          type: integer
+#          format: int32
+#        brandName:
+#          x-field-extra-annotation: "@javax.persistence.Column(name=\"BRAND_NAME\")"
+#          type: String
